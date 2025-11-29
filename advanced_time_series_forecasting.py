@@ -652,4 +652,81 @@ class AttentionAnalyzer:
                 np.concatenate(sample_inputs, axis=0),
                 np.concatenate(sample_outputs, axis=0))
     
-    def plot_attention
+        def plot_attention_heatmap(self, attention_weights, inputs, sample_idx=0):
+        """Plot attention heatmap for a sample"""
+        if self.model_name == 'AttentionLSTM':
+            # attention_weights shape: (seq_length,)
+            attn_weights = attention_weights[sample_idx]
+            seq_length = len(attn_weights)
+            
+            plt.figure(figsize=(12, 4))
+            plt.imshow(attn_weights.reshape(1, -1), cmap='viridis', aspect='auto')
+            plt.colorbar(label='Attention Weight')
+            plt.title(f'{self.model_name} - Attention Weights (Sample {sample_idx})')
+            plt.xlabel('Time Step')
+            plt.yticks([])
+            
+        elif self.model_name == 'Transformer':
+            # attention_weights shape: (seq_length, seq_length)
+            attn_weights = attention_weights[sample_idx]
+            
+            plt.figure(figsize=(10, 8))
+            sns.heatmap(attn_weights, cmap='viridis', annot=False, fmt='.3f')
+            plt.title(f'{self.model_name} - Self-Attention Weights (Sample {sample_idx})')
+            plt.xlabel('Key Position')
+            plt.ylabel('Query Position')
+        
+        plt.tight_layout()
+        plt.show()
+    
+    def plot_attention_temporal_pattern(self, attention_weights, inputs, scalers, sample_idx=0):
+        """Plot attention weights along with input time series"""
+        if self.model_name == 'AttentionLSTM':
+            attn_weights = attention_weights[sample_idx]
+            input_sequence = inputs[sample_idx, :, 0]  # Main series
+            
+            # Inverse transform
+            scaler = scalers[0]
+            input_sequence_original = scaler.inverse_transform(input_sequence.reshape(-1, 1)).flatten()
+            
+            fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(12, 8))
+            
+            # Plot input sequence
+            time_steps = range(len(input_sequence_original))
+            ax1.plot(time_steps, input_sequence_original, 'b-', linewidth=2, label='Input Series')
+            ax1.set_ylabel('Value')
+            ax1.set_title('Input Time Series')
+            ax1.grid(True)
+            ax1.legend()
+            
+            # Plot attention weights
+            ax2.bar(time_steps, attn_weights, alpha=0.7, color='red')
+            ax2.set_xlabel('Time Step')
+            ax2.set_ylabel('Attention Weight')
+            ax2.set_title('Attention Weights Distribution')
+            ax2.grid(True)
+            
+            plt.tight_layout()
+            plt.show()
+            
+            # Print analysis
+            print(f"Attention Analysis for Sample {sample_idx}:")
+            print(f"Mean attention weight: {np.mean(attn_weights):.4f}")
+            print(f"Std attention weight: {np.std(attn_weights):.4f}")
+            print(f"Max attention at time step: {np.argmax(attn_weights)}")
+            print(f"Top 3 attention time steps: {np.argsort(attn_weights)[-3:][::-1]}")
+    
+    def analyze_attention_patterns(self, data_loader, scalers, num_samples=2):
+        """Comprehensive attention pattern analysis"""
+        attention_weights, inputs, outputs = self.get_attention_weights(data_loader, num_samples)
+        
+        print(f"=== {self.model_name} Attention Analysis ===")
+        print(f"Overall attention statistics:")
+        print(f"  Mean attention weight: {np.mean(attention_weights):.4f}")
+        print(f"  Std attention weight: {np.std(attention_weights):.4f}")
+        
+        # Plot for each sample
+        for i in range(min(num_samples, len(attention_weights))):
+            self.plot_attention_heatmap(attention_weights, inputs, i)
+            if self.model_name == 'AttentionLSTM':
+                self.plot_attention_temporal_pattern(attention_weights, inputs, scalers, i)
