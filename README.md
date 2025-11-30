@@ -1,38 +1,35 @@
-# Advanced Time Series Forecasting with Attention Mechanisms
+# Advanced Time Series Forecasting with Uncertainty Quantification
 
 ## Project Overview
-This project implements and compares three neural architectures for multivariate time series forecasting using synthetic data with complex patterns. The implementation includes systematic model evaluation and comprehensive attention mechanism analysis.
+This project implements and compares neural architectures for multivariate time series forecasting with comprehensive uncertainty quantification using Pinball loss and CRPS scoring.
 
-## Key Features
-- Synthetic multivariate time series with complex seasonality and trends
-- Three model architectures: Standard LSTM, Attention LSTM, Transformer
-- Walk-forward cross-validation for robust time series evaluation
-- Comprehensive attention mechanism analysis and interpretation
-- Detailed performance-complexity trade-off analysis
+## Core Features
+- Uncertainty quantification using quantile regression
+- Pinball loss for model training
+- CRPS (Continuous Ranked Probability Score) for evaluation
+- Coverage Rate and Prediction Interval Width metrics
+- Three model architectures with probabilistic outputs
+- Walk-forward cross-validation
+- Probabilistic ARIMA baseline
 
-## Experimental Results
+## Key Metrics (Required by Project)
+- **CRPS**: Continuous Ranked Probability Score (primary metric)
+- **Coverage Rate**: Empirical coverage of prediction intervals
+- **Interval Width**: Average width of prediction intervals
+- **RMSE/MAE**: Point forecast accuracy (secondary metrics)
 
-### Model Performance on Synthetic Time Series Data
-| Model | RMSE | MAE | MAPE | Complexity |
-|-------|------|-----|------|------------|
-| Standard LSTM | [Actual Value] | [Actual Value] | [Actual Value]% | Low |
-| Attention LSTM | [Actual Value] | [Actual Value] | [Actual Value]% | Medium |
-| Transformer | [Actual Value] | [Actual Value] | [Actual Value]% | High |
-| ARIMA | [Actual Value] | [Actual Value] | [Actual Value]% | Very Low |
+## Model Architectures
+1. **QuantileTransformer**: Transformer with quantile output
+2. **QuantileAttentionLSTM**: LSTM with attention and quantile output  
+3. **QuantileLSTM**: Standard LSTM with quantile output
+4. **ProbabilisticARIMA**: ARIMA with prediction intervals
 
-*Note: Actual values will be populated when code is executed*
-
-### Key Findings
-1. **Performance**: [Best model based on actual results] achieved the best forecasting accuracy
-2. **Interpretability**: Attention mechanisms provided insights into temporal dependencies
-3. **Efficiency**: Trade-off analysis between model complexity and performance
-4. **Validation**: Walk-forward cross-validation ensured robust evaluation
-
-### Attention Mechanism Insights
-- Analysis of which time steps received highest attention weights
-- Interpretation of temporal patterns learned by attention mechanisms
-- Comparison of attention patterns between different architectures
+## Uncertainty Quantification
+- Models output multiple quantiles (0.1, 0.5, 0.9)
+- 80% prediction intervals computed from 0.1 and 0.9 quantiles
+- Pinball loss optimizes for accurate quantile predictions
+- CRPS evaluates overall probabilistic forecast quality
 
 ## Usage
 ```python
-python corrected_time_series_forecasting.py
+python uncertainty_forecasting.py
